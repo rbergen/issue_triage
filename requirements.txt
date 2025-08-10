@@ -1,0 +1,23 @@
+# Issue Triage Copilot - Consolidated Dependencies
+# This file replaces backend/requirements.txt and ui/requirements.txt
+
+# Backend API Dependencies (FastAPI)
+fastapi==0.111.0
+uvicorn[standard]==0.30.0
+pydantic==2.7.2
+SQLAlchemy==2.0.30
+psycopg[binary,pool]==3.1.19
+openai==1.35.4
+markdown-it-py==3.0.0
+
+# UI Dependencies (Streamlit)
+streamlit==1.36.0
+
+# Shared Dependencies
+httpx==0.27.0
+python-dotenv==1.0.1
+
+# Development and Testing (optional)
+# pytest==7.4.0
+# black==23.7.0
+# ruff==0.0.287

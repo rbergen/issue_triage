@@ -1,0 +1,39 @@
+version: "3.9"
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: triage-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=triage
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+
+  api:
+    build: ./backend
+    container_name: triage-api
+    env_file: .env
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+
+  ui:
+    image: python:3.11-slim
+    container_name: triage-ui
+    working_dir: /app
+    volumes:
+      - ./ui:/app
+    env_file: .env
+    command: ["bash","-lc","pip install -r requirements.txt && streamlit run streamlit_app.py --server.port 8501 --server.address 0.0.0.0"]
+    ports:
+      - "8501:8501"
+    depends_on:
+      - api
+
+volumes:
+  pgdata:
