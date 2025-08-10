@@ -1,15 +1,8 @@
 import argparse, json, os
 from typing import List
-
-try:
-    from .clean_text import md_to_text
-    from .chunker import create_chunks_for_document
-    from .config import DATABASE_URL, OPENAI_API_KEY, EMBEDDING_MODEL, EMBEDDING_DIM
-except ImportError:
-    from clean_text import md_to_text
-    from chunker import create_chunks_for_document
-    from config import DATABASE_URL, OPENAI_API_KEY, EMBEDDING_MODEL, EMBEDDING_DIM
-
+from clean_text import md_to_text
+from chunker import create_chunks_for_document
+from config import DATABASE_URL, OPENAI_API_KEY, EMBEDDING_MODEL, EMBEDDING_DIM
 from openai import OpenAI
 import psycopg
 

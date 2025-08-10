@@ -39,9 +39,9 @@ def qa(req: QARequest):
         messages=[{"role":"system","content":sys},{"role":"user","content":user}],
         temperature=0.1,
     )
-    
+
     if not chat.choices or not chat.choices[0].message.content:
         raise HTTPException(status_code=500, detail="Failed to generate answer")
-    
+
     answer = chat.choices[0].message.content
     return QAResponse(answer=answer, citations=citations)
