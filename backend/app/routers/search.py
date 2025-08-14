@@ -1,3 +1,4 @@
+"""Search router: vector search over embedded documents."""
 from fastapi import APIRouter, HTTPException
 from ..schemas import SearchResponse, SearchResponseItem
 from ..config import settings
@@ -8,6 +9,13 @@ router = APIRouter(prefix="/search", tags=["search"])
 
 @router.get("/", response_model=SearchResponse)
 def search(q: str, repo: str | None = None, k: int = 8):
+    """Search embedded docs by query embedding and vector distance.
+
+    Args:
+        q: Natural language query.
+        repo: Optional repo filter (owner/name).
+        k: Max number of results to return.
+    """
     # Embed the query
     client = get_openai_client()
     if client is None:

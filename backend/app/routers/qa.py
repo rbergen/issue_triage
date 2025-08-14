@@ -1,3 +1,5 @@
+"""Q&A router: retrieval-augmented answering over indexed documents."""
+
 from fastapi import APIRouter, HTTPException
 from ..schemas import QARequest, QAResponse
 from ..config import settings
@@ -8,17 +10,21 @@ router = APIRouter(prefix="/qa", tags=["qa"])
 
 @router.post("/", response_model=QAResponse)
 def qa(req: QARequest):
+    """Answer a question using nearest retrieved documents as context."""
     client = get_openai_client()
     if client is None:
         raise HTTPException(status_code=500, detail="OPENAI_API_KEY not configured")
 
-    emb = client.embeddings.create(model=settings.embedding_model, input=req.question).data[0].embedding
+    embedding_response = client.embeddings.create(model=settings.embedding_model, input=req.question)
+    if not embedding_response or not getattr(embedding_response, "data", None) or len(embedding_response.data) == 0 or not hasattr(embedding_response.data[0], "embedding"):
+        raise HTTPException(status_code=500, detail="Failed to generate embedding")
+    emb = embedding_response.data[0].embedding
 
-    sql = (
-        "SELECT url, title, body, (embedding <-> :vec) AS score FROM docs "
-        + ("WHERE repo = :repo " if req.repo else "") +
-        "ORDER BY embedding <-> :vec ASC LIMIT :k"
-    )
+    base_sql = "SELECT url, title, body, (embedding <-> :vec) AS score FROM docs"
+    where_clause = " WHERE repo = :repo" if req.repo else ""
+    order_limit = " ORDER BY embedding <-> :vec ASC LIMIT :k"
+    sql = base_sql + where_clause + order_limit
+
     params = {"vec": emb, "k": req.k}
     if req.repo:
         params["repo"] = req.repo
@@ -40,8 +46,8 @@ def qa(req: QARequest):
         temperature=0.1,
     )
 
-    if not chat.choices or not chat.choices[0].message.content:
+    if not chat.choices or len(chat.choices) == 0 or not getattr(chat.choices[0].message, "content", None):
         raise HTTPException(status_code=500, detail="Failed to generate answer")
 
-    answer = chat.choices[0].message.content
+    answer = chat.choices[0].message.content or ""
     return QAResponse(answer=answer, citations=citations)

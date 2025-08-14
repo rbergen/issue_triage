@@ -1,3 +1,5 @@
+"""Triage router: duplicate suggestion and draft reply generation."""
+
 from fastapi import APIRouter, HTTPException
 from ..schemas import TriageRequest, TriageResponse, TriageCandidate
 from ..config import settings
@@ -8,6 +10,7 @@ router = APIRouter(prefix="/triage", tags=["triage"])
 
 @router.post("/", response_model=TriageResponse)
 def triage(req: TriageRequest):
+    """Suggest duplicates and draft a reply using retrieved candidates."""
     client = get_openai_client()
     if client is None:
         raise HTTPException(status_code=500, detail="OPENAI_API_KEY not configured")

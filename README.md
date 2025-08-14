@@ -1,4 +1,4 @@
-# Issue Triage Copilot (PoC)
+# Issue Triage PoC
 
 A practical RAG demo over public GitHub issues/comments. Ingests issues, indexes embeddings in pgvector, and exposes FastAPI endpoints for semantic search, duplicate suggestions (triage), and Q&A with citations.
 
@@ -11,11 +11,11 @@ cp .env.example .env
 # 2) Start db + api
 docker compose up -d --build
 
-# 3) Ingest a couple of public repos (e.g., tiangolo/fastapi)
+# 3) Ingest a couple of public repos (e.g., fastapi/fastapi)
 python -m venv .venv && source .venv/bin/activate
-pip install -r backend/requirements.txt
-python ingest/fetch_github.py --repo tiangolo/fastapi --max 200
-python ingest/indexer.py --repo tiangolo/fastapi
+pip install -r requirements.txt
+python ingest/fetch_github.py --repo fastapi/fastapi --max 200
+python ingest/indexer.py --repo fastapi/fastapi
 
 # 4) Try the API
 open http://localhost:8000/docs

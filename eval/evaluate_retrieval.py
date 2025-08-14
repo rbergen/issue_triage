@@ -4,8 +4,6 @@ Provide a CSV in eval/goldsets with columns: query, expected_url (or pipe-separa
 Computes Recall@k and MRR@k.
 """
 import csv, argparse
-from typing import List
-from openai import OpenAI
 from backend.app.config import settings
 from backend.app.db import query
 from backend.app.deps import get_openai_client
@@ -27,7 +25,7 @@ def retrieve(q: str, k: int = 5, repo: str | None = None):
     return query(sql, params)
 
 
-def recall_mrr(golds: List[str], hits: List[str]):
+def recall_mrr(golds: list[str], hits: list[str]):
     # golds can be multiple accepted URLs
     goldset = set(golds)
     recall = 1.0 if any(h in goldset for h in hits) else 0.0
